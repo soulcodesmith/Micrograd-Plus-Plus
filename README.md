@@ -63,7 +63,7 @@ The forward pass builds a graph while calculating values. Calling `backward()` w
 From the project root:
 
 ```bash
-python3 -m tests.test_engine
+python3 -m unittest discover -v
 python3 -m py_compile micrograd/engine.py tests/test_engine.py
 ```
 

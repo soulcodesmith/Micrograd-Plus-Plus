@@ -81,6 +81,8 @@ class Value:
     def __sub__(self, other):
         return self + (-other)
 
+    def __rsub__(self, other):
+        return other + (-self)
 
     def __radd__(self, other):
         return self + other
@@ -103,3 +105,7 @@ class Value:
     def __truediv__(self, other):
         other = other if isinstance(other, Value) else Value(other)
         return self * (other ** -1)
+
+    def __rtruediv__(self, other):
+        return other * (self ** -1)
+
