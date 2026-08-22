@@ -167,5 +167,20 @@ def test_gradient_accumulation():
     assert y2.data == 9.0
     assert x2.grad == 6.0
 
+
+def test_relu():
+    x = Value(-2.0)
+    y = x.relu()
+    y.backward()
+    assert y.data == 0.0
+    assert x.grad == 0.0
+
+    x = Value(2.0)
+    y = x.relu()
+    y.backward()
+    assert y.data == 2.0
+    assert x.grad == 1.0
+
+
 if __name__ == "__main__":
     main()

@@ -106,3 +106,51 @@ class Value:
         other = other if isinstance(other, Value) else Value(other)
         return self * (other ** -1)
 
+
+# Activation functions
+    def relu(self):
+        out = Value(0.0 if self.data < 0 else self.data, (self,), 'ReLU')
+
+        def _backward():
+            self.grad += (out.data > 0) * out.grad
+
+        out._backward = _backward
+        return out
+
+    def exp(self):
+        out = Value(math.exp(self.data), (self,), 'exp')
+
+        def _backward():
+            self.grad += out.data * out.grad
+
+        out._backward = _backward
+        return out
+
+    def log(self):
+        out = Value(math.log(self.data), (self,), 'log')
+
+        def _backward():
+            self.grad += (1 / self.data) * out.grad
+
+        out._backward = _backward
+        return out
+
+    def sigmoid(self):
+        s = 1 / (1 + math.exp(-self.data))
+        out = Value(s, (self,), 'sigmoid')
+
+        def _backward():
+            self.grad += (s * (1 - s)) * out.grad  # chain rule
+
+        out._backward = _backward
+        return out
+
+    def leakyrelu(self, alpha=0.01):
+        out = Value(self.data if self.data > 0 else alpha * self.data, (self,), 'LeakyReLU')
+
+        def _backward():
+            self.grad += (1.0 if self.data > 0 else alpha) * out.grad
+
+        out._backward = _backward
+        return out
+    
