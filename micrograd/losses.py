@@ -1,6 +1,7 @@
 # Loss functions
 from micrograd.engine import Value
 
+# Mean Squared Error.
 class MSELoss:
     def __call__(self, predictions, targets):
         if len(predictions) != len(targets):
