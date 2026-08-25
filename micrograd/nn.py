@@ -1,10 +1,12 @@
 # Neural network building blocks (Module, Neuron, Layer, MLP)
 from micrograd.engine import Value
 import random
+
 class Module:
     def parameters(self):
         return[]
 
+    # zerograd
     def zero_grad(self):
         for p in self.parameters():
             p.grad = 0.0
@@ -47,5 +49,3 @@ class MLP(Module):
 
     def parameters(self):
         return [p for layer in self.layers for p in layer.parameters()]
-    
-
