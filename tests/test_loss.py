@@ -21,4 +21,3 @@ def test_mse_loss_backwarda():
 
     assert predictions[0].grad == 1.0
     assert predictions[1].grad == -2.0
-

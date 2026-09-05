@@ -17,14 +17,14 @@ class Neuron(Module):
         self.b = Value(0.0)
 
     def __call__(self, x):
-        act = sum((wi * xi for wi, xi in zip(self.w, x)), Value(0))
+        act = sum((wi * xi for wi, xi in zip(self.w, x)), self.b)
         out = act.tanh()
         return out
 
     def parameters(self):
         return self.w + [self.b]
 
-
+# Layers
 class Layer(Module):
     def __init__(self, nin, nout):
         self.neurons = [Neuron(nin) for _ in range(nout)]
@@ -37,6 +37,7 @@ class Layer(Module):
         return [p for n in self.neurons for p in n.parameters()]
     
 
+# Multilayer Percentron
 class MLP(Module):
     def __init__(self, nin, nouts):
         sz = [nin] + nouts
@@ -49,3 +50,4 @@ class MLP(Module):
 
     def parameters(self):
         return [p for layer in self.layers for p in layer.parameters()]
+
