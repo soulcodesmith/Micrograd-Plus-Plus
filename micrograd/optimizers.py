@@ -1,4 +1,7 @@
 # Optimizers
+import math
+
+
 class Optimizer:
     def __init__(self, params):
         self.params = list(params)
@@ -34,6 +37,63 @@ class SGD(Optimizer):
             else:
                 # Vanilla SGD (no momentum tracking needed)
                 p.data -= self.lr * p.grad
+
+
+# Adam (Adaptive Moment Estimation)
+class Adam(Optimizer):
+    """Adam optimizer for scalar ``Value`` parameters.
+
+    Adam combines:
+    - momentum: an exponential moving average of the gradients; and
+    - adaptive scaling: an exponential moving average of squared gradients.
+
+    The state is kept separately for every parameter because each parameter
+    can have a different gradient history.
+    """
+
+    def __init__(self, params, lr=0.001, betas=(0.9, 0.999), eps=1e-8):
+        super().__init__(params)
+
+        if lr < 0.0:
+            raise ValueError("Learning rate must be non-negative.")
+        if not 0.0 <= betas[0] < 1.0 or not 0.0 <= betas[1] < 1.0:
+            raise ValueError("Adam betas must be in the interval [0, 1).")
+        if eps < 0.0:
+            raise ValueError("Adam epsilon must be non-negative.")
+
+        self.lr = lr
+        self.beta1, self.beta2 = betas
+        self.eps = eps
+
+        # Adam needs two persistent scalar buffers per parameter:
+        # m = first moment (smoothed gradient / direction)
+        # v = second raw moment (smoothed squared gradient / scale)
+        self.m = {id(p): 0.0 for p in self.params}
+        self.v = {id(p): 0.0 for p in self.params}
+        self.step_count = 0
+
+    def step(self):
+        self.step_count += 1
+        t = self.step_count
+
+        for p in self.params:
+            grad = p.grad
+
+            # Exponential moving averages.  The (1 - beta) terms make these
+            # moving averages track the scale of the current gradients.
+            m = self.beta1 * self.m[id(p)] + (1.0 - self.beta1) * grad
+            v = self.beta2 * self.v[id(p)] + (1.0 - self.beta2) * (grad ** 2)
+            self.m[id(p)] = m
+            self.v[id(p)] = v
+
+            # Starting from m_0 = v_0 = 0 makes early estimates too small.
+            # Remove that cold-start bias before calculating the update.
+            m_hat = m / (1.0 - self.beta1 ** t)
+            v_hat = v / (1.0 - self.beta2 ** t)
+
+            # Descend in the direction of the bias-corrected gradient, while
+            # dividing by its recent RMS magnitude.
+            p.data -= self.lr * m_hat / (math.sqrt(v_hat) + self.eps)
 
 
     
